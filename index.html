@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TypeUp</title>
+    <link rel="stylesheet" href="styles.css"/>
+  </head>
+  <body>
+    <main class="app">
+      <header class="app__header">
+        <h1 class="app__title">TypeUp</h1>
+        <p class="app__subtitle">AI improve your typing skills</p>
+      </header>
+
+      <section class="api-settings" aria-label="AI settings">
+        <label class="api-settings__label" for="apiKeyInput">
+          OpenAI API key
+          <input
+            id="apiKeyInput"
+            class="api-settings__input"
+            type="password"
+            placeholder="set your api key"
+            autocomplete="off"
+          />
+        </label>
+        <div class="api-settings__actions">
+          <button id="saveApiKey" class="button button--primary" type="button">save key</button>
+          <button id="clearApiKey" class="button" type="button">delete key</button>
+        </div>
+        <p id="apiKeyStatus" class="api-settings__status" aria-live="polite"></p>
+      </section>
+
+      <section class="stats" aria-live="polite">
+        <div class="stat">
+          <span class="stat__label">input time</span>
+          <span id="elapsedTime" class="stat__value">0秒</span>
+        </div>
+        <div class="stat">
+          <span class="stat__label">input characters</span>
+          <span id="totalChars" class="stat__value">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat__label">mistake characters</span>
+          <span id="errorCount" class="stat__value">0</span>
+        </div>
+        <div class="stat">
+          <span class="stat__label">accuracy</span>
+          <span id="accuracy" class="stat__value">100%</span>
+        </div>
+        <div class="stat">
+          <span class="stat__label">WPM</span>
+          <span id="wpm" class="stat__value">0</span>
+        </div>
+      </section>
+
+      <section class="weak-keys" id="weakKeysSection" style="display: none;">
+        <h3>weak keys analysis</h3>
+        <div id="weakKeysList" class="weak-keys__list"></div>
+      </section>
+
+      <section class="ai-status" id="aiStatusSection" style="display: none;">
+        <h3>AI generated QUOTES</h3>
+        <div id="aiStatusList" class="ai-status__list"></div>
+      </section>
+
+      <section class="prompt" aria-label="practice text">
+        <div id="quote" class="prompt__text" role="textbox" aria-readonly="true"></div>
+        <div id="romaji" class="prompt__romaji" aria-label="romaji display"></div>
+      </section>
+
+      <section class="input" aria-label="input field">
+        <textarea
+          id="input"
+          class="input__field"
+          placeholder="start button to start practice"
+          rows="4"
+        ></textarea>
+      </section>
+
+      <section class="controls">
+        <button id="start" class="button button--primary">start</button>
+        <button id="next" class="button" type="button">next topic</button>
+      </section>
+
+      <section class="feedback" aria-live="polite">
+        <p id="feedback" class="feedback__message"></p>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
