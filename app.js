@@ -8,16 +8,16 @@
 
   // デフォルトのQUOTES（フォールバック用）
   const DEFAULT_QUOTES = [
-    "Knowledge is a treasure that no one can take away from you. It accumulates over time and helps in various life situations.",
-    "Small steps lead to big changes. Daily accumulation will eventually lead to great results.",
-    "Concentrating and typing accurately improves work efficiency and reduces stress.",
-    "Practice makes perfect. Continuing to practice a little each day will definitely lead to improvement.",
-    "Take deep breaths and relax while typing rhythmically. This is important for good performance.",
-    "Don't be afraid of errors when challenging yourself. This is the first step to growth. We learn a lot from failures.",
-    "Typing skills are one of the important abilities in modern society. Accurate and fast typing greatly improves work efficiency.",
-    "Through repeated practice, your fingers will move naturally, and your thoughts and finger movements will become integrated.",
-    "It is important to sit with correct posture, relax your wrists, and be conscious of finger positions while typing.",
-    "Focus on accuracy rather than speed, and gradually increase your speed. This is the key to improvement."
+    "学んだことは誰にも奪われない宝物です。知識は時間とともに蓄積され、人生の様々な場面で役立ちます。",
+    "小さな一歩が大きな変化を生み出します。毎日の積み重ねが、やがて大きな成果につながるのです。",
+    "集中して正確にタイピングすることで、作業効率が向上し、ストレスも軽減されます。",
+    "継続は力なり。毎日少しずつでも練習を続けることで、必ず上達することができます。",
+    "深呼吸をしてリラックスしながら、リズムよくキーを打つことが大切です。",
+    "エラーを恐れずに挑戦することが、成長への第一歩となります。失敗から学ぶことが多いのです。",
+    "タイピングスキルは現代社会において重要な能力の一つです。正確で速いタイピングは、仕事の効率を大幅に向上させます。",
+    "練習を重ねることで、指が自然に動くようになり、思考と指の動きが一体化した状態になります。",
+    "正しい姿勢で座り、手首をリラックスさせて、指の位置を意識しながらタイピングすることが重要です。",
+    "速さよりも正確性を重視し、徐々にスピードを上げていくことが上達のコツです。"
   ];
 
   const quoteDisplay = document.getElementById("quote");
@@ -168,7 +168,7 @@
         messages: [
           {
             role: "system",
-            content: "You create Japanese typing practice sentences. Respond only as JSON with keys 'text', 'romaji', and 'romaji_tokens'. 'romaji_tokens' must be an array whose length equals the number of characters in 'text', each item containing the Hepburn romaji for the matching character (preserve spaces and punctuation)."
+            content: "You create Japanese typing practice sentences. Respond only as JSON with keys 'text', 'romaji', and 'romaji_tokens'. 'romaji_tokens' must be an array whose length exactly matches the number of characters in 'text' (counting characters with Array.from). Each element must contain the lowercase Hepburn romaji for that single character. Preserve spaces and punctuation by returning the same symbol for them. Do not merge multiple characters into one item."
           },
           {
             role: "user",
@@ -198,7 +198,7 @@
 
     const text = typeof payload.text === "string" ? payload.text.trim() : "";
     const romaji = typeof payload.romaji === "string" ? payload.romaji.trim() : "";
-    const romajiTokens = Array.isArray(payload.romaji_tokens)
+    let romajiTokens = Array.isArray(payload.romaji_tokens)
       ? payload.romaji_tokens.map(token => typeof token === "string" ? token : String(token ?? ""))
       : Array.isArray(payload.romajiTokens)
         ? payload.romajiTokens.map(token => typeof token === "string" ? token : String(token ?? ""))
@@ -206,6 +206,11 @@
 
     if (!text) {
       throw new Error("AI did not return a text value");
+    }
+
+    const textLength = [...text].length;
+    if (!romajiTokens || romajiTokens.length !== textLength) {
+      romajiTokens = convertTextToRomajiTokens(text);
     }
 
     return {
@@ -267,7 +272,7 @@
     });
   };
 
-  // 文字に対応するローマ字を取得（大文字で返す）
+  // 文字に対応するローマ字を取得（候補がある場合は先頭を返す）
   const getRomajiForChar = (char) => {
     const romajiMap = {
       // ひらがな
@@ -357,7 +362,14 @@
     };
     
     // マッピングにない文字はそのまま返す（英数字など）
-    return romajiMap[char] || char.toUpperCase();
+    const value = romajiMap[char];
+    if (Array.isArray(value)) {
+      return value[0];
+    }
+    if (typeof value === "string") {
+      return value;
+    }
+    return char;
   };
 
 
